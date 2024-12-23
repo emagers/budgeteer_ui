@@ -1,21 +1,46 @@
-import logo from './logo.svg';
 import './App.css';
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js/auto';
-import { Pie, Bar, Line } from 'react-chartjs-2';
+import { Pie, Line } from 'react-chartjs-2';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function App() {
+	const [data, setData] = useState(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const result = await axios.get('http://localhost:8080/account/1/summary');
+				setData(result.data);
+				setLoading(false);
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+		};
+
+		fetchData();
+		const interval = setInterval(fetchData, 300000); // 5 minutes
+
+		return () => clearInterval(interval);
+	}, []);
+
+	if (loading) {
+		return <div>Loading...</div>;
+	}
+
 	return (
 		<div>
 		<NavBar />
 		<div class="body-panels">
 			<div class="bp" />
 			<div>
-				<NetWorthSummary />
-				<AccountHistogram />
-				<AccountTable />
+				<NetWorthSummary summary={data['total_by_type']} />
+				<AccountHistogram history={data['snapshot_history']} />
+				<AccountTable accounts={data.account_balance_with_mom_change} />
 			</div>
 			<div class="bp" />
 		</div>
@@ -27,7 +52,6 @@ function NavBar() {
 	const { t, i18n } = useTranslation();
 	const name = "John Doe";
 
-	// create a function to switch the language
 	const on_switch = () => {
 		i18n.changeLanguage(i18n.language === 'en' ? 'br' : 'en');
 	}
@@ -45,17 +69,54 @@ function NavBar() {
 	)
 }
 
-function NetWorthSummary() {
+const COLORS = [
+	'#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+	'#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+	'#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399'
+];
+/// Create a list of 30 colors that are a much whiter version of the colors above, they should correspond to the colors above in order
+const LIGHTER_COLORS = COLORS.map(color => {
+	const colorObj = new Option().style;
+	colorObj.color = color;
+	const rgb = colorObj.color.match(/\d+/g).map(Number);
+	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.3)`;
+});
+
+const COMPLEMENTARY_COLORS = [
+	'#00CCFF', '#004C99', '#00CC00', '#000066', '#FF4C4C', '#1A66FF', '#FFCC00', '#666600', '#660066', '#4DFF4D',
+	'#FF4D4D', '#FF6600', '#1A1AFF', '#FFB3B3', '#FFCC99', '#00FF99', '#0033CC', '#00FFCC', '#FF9933', '#CCFF33',
+	'#FF66CC', '#FF1A1A', '#00FF66', '#FF3300', '#FF99FF', '#FFCC66', '#00FF33', '#FF66FF', '#FF4DFF', '#FF1AFF'
+];
+
+function GetRandomColors(num) {
+	const colors = {
+		backgroundColors: [],
+		lightColors: [],
+		complementaryColors: []
+	};
+	for (let i = 0; i < num; i++) {
+		const idx = Math.floor(Math.random() * COLORS.length);
+		colors.backgroundColors.push(COLORS[idx]);
+		colors.lightColors.push(LIGHTER_COLORS[idx]);
+		colors.complementaryColors.push(COMPLEMENTARY_COLORS[idx]);
+	}
+	return colors;
+}
+
+function NetWorthSummary({ summary }) {
 	const { t } = useTranslation();
-	const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+
+	const colors = GetRandomColors(Object.keys(summary).length);
+
 	const data = {
-		labels: [ "Liquid Cash", "Retirement", "Stocks"],
+		labels: Object.keys(summary),
 		datasets: [{
-			data: [1000, 20000, 5000],
-			backgroundColor: COLORS,
-			hoverBackgroundColor: COLORS,
+			data: Object.values(summary),
+			backgroundColor: colors.backgroundColors,
+			hoverBackgroundColor: colors.lightColors,
 			borderColor: '#000000'
-		}]};
+		}]
+	};
 
 	const options = {
 		responsive: false,
@@ -64,7 +125,7 @@ function NetWorthSummary() {
 				position: 'top',
 			},
 		},
-	}; //{ maintainAspectRatio: false, aspectRation:1 }
+	};
 
 	return (
 		<div class="net-worth-summary">
@@ -81,7 +142,7 @@ function NetWorthSummary() {
 	)
 }
 
-function AccountHistogram() {
+function AccountHistogram({ history }) {
 	const { t } = useTranslation();
 
 	const options = {
@@ -93,68 +154,26 @@ function AccountHistogram() {
 		},
 	};
 
+	const maxLength = Math.max(...history.map(snapshot => snapshot.snapshots.length));
+
+	const colors = GetRandomColors(maxLength);
+
+	const distinctAccounts = history.map(snapshot => snapshot.snapshots.map(s => s.name)).flat().filter((value, index, self) => self.indexOf(value) === index);
+
 	const data = {
-		labels: [
-			'Jan 2022', 'Feb 2022', 'Mar 2022', 'Apr 2022', 'May 2022', 'Jun 2022',
-			'Jul 2022', 'Aug 2022', 'Sep 2022', 'Oct 2022', 'Nov 2022', 'Dec 2022',
-			'Jan 2023', 'Feb 2023', 'Mar 2023', 'Apr 2023', 'May 2023', 'Jun 2023',
-			'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 'Dec 2023',
-			'Jan 2024', 'Jan 2025', 'Jan 2028', 'Jan 2033'
-		],
-		datasets: [
-			{
-				label: 'US Bank',
-				data: [500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, null, null, null, null, null, null, null, null, null, null, null],
-				borderColor: '#FF6384',
-				backgroundColor: 'rgba(255, 99, 132, 0.2)',
-			},
-			{
-				label: 'Chase',
-				data: [400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, null, null, null, null, null, null, null, null, null, null, null],
-				borderColor: '#36A2EB',
-				backgroundColor: 'rgba(54, 162, 235, 0.2)',
-			},
-			{
-				label: 'CIT',
-				data: [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, null, null, null, null, null, null, null, null, null, null, null],
-				borderColor: '#FFCE56',
-				backgroundColor: 'rgba(255, 206, 86, 0.2)',
-			},
-			{
-				label: 'Fidelity - Individual',
-				data: [200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, null, null, null, null, null, null, null, null, null, null, null],
-				borderColor: '#4BC0C0',
-				backgroundColor: 'rgba(75, 192, 192, 0.2)',
-			},
-			{
-				label: 'US Bank (Projected)',
-				data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300],
-				borderColor: '#FF6384',
-				borderDash: [5, 5],
-				backgroundColor: 'rgba(255, 99, 133, 0.58)',
-			},
-			{
-				label: 'Chase (Projected)',
-				data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200],
-				borderColor: '#36A2EB',
-				borderDash: [5, 5],
-				backgroundColor: 'rgba(54, 163, 235, 0.57)',
-			},
-			{
-				label: 'CIT (Projected)',
-				data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000],
-				borderColor: '#FFCE56',
-				borderDash: [5, 5],
-				backgroundColor: 'rgba(255, 207, 86, 0.51)',
-			},
-			{
-				label: 'Fidelity - Individual (Projected)',
-				data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900],
-				borderColor: '#4BC0C0',
-				borderDash: [5, 5],
-				backgroundColor: 'rgba(75, 192, 192, 0.52)',
-			},
-		],
+		labels: history.map(snapshot => snapshot.date),
+		datasets:
+			distinctAccounts.map((accountName, idx) => {
+				return {
+					label: accountName,
+					data: history.map(snapshot => {
+						const account = snapshot.snapshots.find(s => s.name === accountName);
+						return account ? account.balance : null;
+					}),
+					borderColor: colors.backgroundColors[idx],
+					backgroundColor: colors.lightColors[idx]
+				};
+			})
 	};
 
 	return (
@@ -172,18 +191,9 @@ function AccountHistogram() {
 	);
 }
 
-function AccountTable() {
+function AccountTable({ accounts}) {
 	const { t, i18n } = useTranslation();
 
-	// Create a grid which displays all the accounts and their currend dollar amounts. The grid should have the following columns: Account Name, Month-over-month change percentage (with a red down or green up arrow), and current dollar amount.
-	const accounts = [
-		{ name: 'US Bank', change: 2.5, amount: 2200 },
-		{ name: 'Chase', change: -1.2, amount: 2100 },
-		{ name: 'CIT', change: 3.1, amount: 2000 },
-		{ name: 'Fidelity - Individual', change: 0.5, amount: 1900 },
-	];
-
-	//the output account.amount should be output such as the thousands separator and decimal characters reflect the current language. For US English, and example would be 1,000.00. For Brazilian Portugues, that would be 1.000,00
 	const formatAmount = (amount, locale) => {
 		return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(amount);
 	};
@@ -200,9 +210,9 @@ function AccountTable() {
 			{accounts.map((account) => (
 			<div class="account-summary-row" key={account.name}>
 				<div class="account-summary-name">{account.name}</div>
-				<div class="account-summary-value">{formatAmount(account.amount)}</div>
-				<div class={"account-summary-mom-increase ".concat(account.change > 0 ? 'green' : 'red')} >
-					{account.change > 0 ? '↑' : '↓'} {account.change}%
+				<div class="account-summary-value">{formatAmount(account.balance)}</div>
+				<div class={"account-summary-mom-increase ".concat(account.percent_change > 0 ? 'green' : 'red')} >
+					{account.percent_change > 0 ? '↑' : '↓'} {formatAmount(account.percent_change.toFixed(2))}%
 				</div>
 			</div>
 			))}
