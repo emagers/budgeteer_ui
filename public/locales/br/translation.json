@@ -3,9 +3,15 @@
 	"net_worth_summary_header": "Resumo do Patrimônio Líquido",
 	"click_to_change_lang": "Clique para mudar o idioma",
 	"navbar_switch_language": "English",
-	"account_histogram_header": "Histograma de Contas",
+	"account_histogram_header": "Histórico de Contas",
 	"account_summary_header": "Resumo de Contas",
 	"account_name": "Nome da Conta",
 	"mom_change": "Variação M. a M.",
-	"current_amount": "Valor Atual"
+	"current_amount": "Valor Atual",
+	"net_worth": "Patrimônio Líquido",
+	"monthly": "mensal",
+	"yearly": "anual",
+	"total": "total",
+	"summary": "Resumo de Contas",
+	"manage_budgets": "Gerenciar Orçamentos"
 }

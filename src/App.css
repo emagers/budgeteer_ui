@@ -16,101 +16,126 @@ a {
 	text-align: center;
 }
 
-.navbar-button {
-	display: grid;
-	grid-template-columns: auto auto;
-	background: 'none';
-	border: 'none';
-	cursor: 'pointer';
-	font-size: 'small';
-	/*add an invisible rounded border*/
-	border: 2px solid transparent;
-	border-radius: 5px;
-}
-
-.navbar-button:hover {
-	background-color: #f0f0f0;
-	transition: background-color 0.3s ease;
-}
-
 .navbar {
-	width: 100%;
-	display: grid;
-	grid-template-columns: auto auto;
+	background-color: #333;
+	color: white;
+	padding: 1rem;
+}
+
+.navbar-brand {
+	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	border-bottom:solid;
-	border-width:1px;
 }
 
-.navbar-div {
-	padding-left: 10px;
-	padding-right: 10px;
-	align-items: left;
-	width: 100%;
+.navbar-item {
+	color: white;
+	padding: 0.5rem 1rem;
+	text-decoration: none;
 }
 
-.net-worth-summary {
+.navbar-burger {
+	cursor: pointer;
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
+	height: 1.5rem;
+	width: 1.5rem;
+}
+
+.navbar-burger span {
+	background-color: white;
+	height: 2px;
 	width: 100%;
-	margin-top: 10px;
-	padding-bottom: 10px;
-	border-radius: 5px;
-	border-style:solid;
-	border-width: 1px;
-	justify-content: center;
-	text-align: center;
-	h2 {
-		margin: 0;
-		padding: 5px;
-		border-bottom: solid;
-		border-width: 1px;
-	}
-	div {
-		height: 300px;
-	}
 }
 
-.net-worth-value {
-	font-size: 1.5em;
-	margin: 5px;
+.navbar-menu {
+	display: none;
+	flex-direction: column;
 }
 
-.account-histogram {
+.navbar-menu.is-active {
+	display: flex;
+	width: 25%;
+}
+
+.navbar-start {
 	display: flex;
 	flex-direction: column;
-	width: 100%;
-	margin-top: 10px;
-	padding-bottom: 10px;
-	border-radius: 5px;
-	border-style:solid;
-	border-width: 1px;
-	h2 {
-		margin: 0;
-		padding: 5px;
-		border-bottom: solid;
-		border-width: 1px;
+}
+
+@media (min-width: 768px) {
+	.navbar-menu {
+			display: flex;
+			flex-direction: row;
 	}
-	div {
-		height: 300px;
+
+	.navbar-start {
+			flex-direction: row;
+	}
+
+	.navbar-burger {
+			display: none;
 	}
 }
 
+.navbar-item-small {
+	margin-left: 20px;
+	cursor: pointer;
+	color: white;
+	text-decoration: none;
+	font-size: x-small;
+}
+
+.net-worth-summary,
+.account-histogram,
 .account-summary-list {
-	margin-top: 10px;
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	border-radius: 5px;
-	border-style:solid;
-	border-width: 1px;
-	h2 {
-		margin: 0;
-		padding: 5px;
-		border-bottom: solid;
-		border-width: 1px;
-	}
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+		justify-content: center;
+		text-align: center;
+}
+
+.net-worth-summary:hover,
+.account-histogram:hover,
+.account-summary-list:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.net-worth-summary h2,
+.account-histogram h2,
+.account-summary-list h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.net-worth-summary p,
+.account-histogram p,
+.account-summary-list p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.net-worth-summary .summary-item,
+.account-histogram .histogram-item,
+.account-summary-list .summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.net-worth-summary .summary-item:last-child,
+.account-histogram .histogram-item:last-child,
+.account-summary-list .summary-item:last-child {
+    border-bottom: none;
 }
 
 .account-summary-box {
@@ -174,5 +199,33 @@ a {
 }
 
 .graph-container {
-	margin: auto;
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+}
+
+.graph-options {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	max-height: 2.5vh;
+}
+
+.graph-options button {
+	margin: 0 5px;
+	padding: 5px 10px;
+	border: none;
+	background-color: #007bff;
+	color: white;
+	cursor: pointer;
+	border-radius: 5px;
+	text-align: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.graph-options button:hover {
+	background-color: #0056b3;
+	transition: background-color 0.8s ease;
 }

@@ -3,9 +3,15 @@
 	"net_worth_summary_header": "Net Worth Summary",
 	"click_to_change_lang": "Click to change language",
 	"navbar_switch_language": "BR-Portuguese",
-	"account_histogram_header": "Account Histogram",
+	"account_histogram_header": "Account History",
 	"account_summary_header": "Account Summary",
 	"account_name": "Account Name",
 	"mom_change": "MoM Change",
-	"current_amount": "Current Amount"
+	"current_amount": "Current Amount",
+	"net_worth": "Net Worth",
+	"monthly": "monthly",
+	"yearly": "yearly",
+	"total": "total",
+	"summary": "Account Summary",
+	"manage_budgets": "Manage Budgets"
 }

@@ -4,6 +4,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js/auto';
 import { Pie, Line } from 'react-chartjs-2';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import chroma from 'chroma-js';
+import { FaBars } from 'react-icons/fa';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -39,7 +41,7 @@ function App() {
 			<div class="bp" />
 			<div>
 				<NetWorthSummary summary={data['total_by_type']} />
-				<AccountHistogram history={data['snapshot_history']} />
+				<AccountHistogram monthly={data['snapshot_history_monthly']} yearly={data['snapshot_history_yearly']} networth={data['snapshot_history_networth']} />
 				<AccountTable accounts={data.account_balance_with_mom_change} />
 			</div>
 			<div class="bp" />
@@ -51,6 +53,7 @@ function App() {
 function NavBar() {
 	const { t, i18n } = useTranslation();
 	const name = "John Doe";
+	const [menuOpen, setMenuOpen] = useState(false);
 
 	const on_switch = () => {
 		i18n.changeLanguage(i18n.language === 'en' ? 'br' : 'en');
@@ -71,67 +74,56 @@ function NavBar() {
 		}
 	};
 
+	const toggleMenu = () => {
+		setMenuOpen(!menuOpen);
+	};
+
 	return (
-		<div class="navbar">
-			<div class="navbar-div">{t('navbar_welcome')} {name}!</div>
-			<div class="navbar-div"><a href="/logout">logout</a></div>
-			<div class="navbar-div">
-				<div onClick={on_switch} class="navbar-button">
-					<span>
-						{flagemojiToPNG(getFlagEmoji(i18n.language))}
-					</span>
-					<span>
-						{t('navbar_switch_language')}
-					</span>
-				</div>
+		<nav className="navbar">
+			<div className="navbar-brand">
+					<div className="navbar-burger" onClick={toggleMenu}>
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+					</div>
+					<a className="navbar-item" href="/">
+						{t('navbar_welcome')} {name}!
+					</a>
 			</div>
-		</div>
+			<div className={`navbar-menu ${menuOpen ? 'is-active' : ''}`}>
+					<div className="navbar-start">
+						<a href="/" className="navbar-item">{t('summary')}</a>
+						<a href="/manage-budgets" className="navbar-item">{t('manage_budgets')}</a>
+						<div className="navbar-item-small" onClick={on_switch}>
+							{flagemojiToPNG(getFlagEmoji(i18n.language))}
+							<span>{t('navbar_switch_language')}</span>
+						</div>
+						<a href="/logout" className="navbar-item">{t('logout')}</a>
+					</div>
+			</div>
+		</nav>
 	)
 }
 
-// const COLORS = [
-// 	'#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
-// 	'#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
-// 	'#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399'
-// ];
-// /// Create a list of 30 colors that are a much whiter version of the colors above, they should correspond to the colors above in order
-// const LIGHTER_COLORS = COLORS.map(color => {
-// 	const colorObj = new Option().style;
-// 	colorObj.color = color;
-// 	const rgb = colorObj.color.match(/\d+/g).map(Number);
-// 	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.3)`;
-// });
-
-// const COMPLEMENTARY_COLORS = [
-// 	'#00CCFF', '#004C99', '#00CC00', '#000066', '#FF4C4C', '#1A66FF', '#FFCC00', '#666600', '#660066', '#4DFF4D',
-// 	'#FF4D4D', '#FF6600', '#1A1AFF', '#FFB3B3', '#FFCC99', '#00FF99', '#0033CC', '#00FFCC', '#FF9933', '#CCFF33',
-// 	'#FF66CC', '#FF1A1A', '#00FF66', '#FF3300', '#FF99FF', '#FFCC66', '#00FF33', '#FF66FF', '#FF4DFF', '#FF1AFF'
-// ];
-
 function GetRandomColors(num) {
-
 	const colors = {
 		backgroundColors: [],
 		lightColors: [],
 		complementaryColors: []
 	};
-	for (let i = 0; i < num; i++) {
-// There should never be any duplicates in the random colors picked, and there should be enough contrast against a white background.
-		let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
 
-		// Remove the hash at the start if it's there
-		let hex = color.replace(/^#/, '');
+	const scale = chroma.scale(['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']).mode('lch').colors(num);
 
-		// Parse the r, g, b values
-		let bigint = parseInt(hex, 16);
-		let r = (bigint >> 16) & 255;
-		let g = (bigint >> 8) & 255;
-		let b = bigint & 255;
+	scale.forEach(color => {
+			const lightColor = chroma(color).alpha(0.3).css();
+			const complementaryColor = chroma(color).set('hsl.h', '+180').css();
 
-		colors.backgroundColors.push(color);
-		colors.lightColors.push(`rgba(${r}, ${g}, ${b}, 0.3)`);
-		colors.complementaryColors.push(`#${(0xFFFFFF - parseInt(hex, 16)).toString(16)}`);
-	}
+			colors.backgroundColors.push(color);
+			colors.lightColors.push(lightColor);
+			colors.complementaryColors.push(complementaryColor);
+	});
+
 	return colors;
 }
 
@@ -174,8 +166,9 @@ function NetWorthSummary({ summary }) {
 	)
 }
 
-function AccountHistogram({ history }) {
+function AccountHistogram({ monthly, yearly, networth }) {
 	const { t } = useTranslation();
+	const [view, setView] = useState('monthly');
 
 	const options = {
 		responsive: false,
@@ -186,38 +179,76 @@ function AccountHistogram({ history }) {
 		},
 	};
 
-	const maxLength = Math.max(...history.map(snapshot => snapshot.snapshots.length));
+	const getData = () => {
+		switch (view) {
+			case 'monthly':
+				return {
+					labels: monthly.map(snapshot => snapshot.date),
+					datasets:
+						distinctAccounts.map((accountName, idx) => {
+							return {
+								label: accountName,
+								data: monthly.map(snapshot => {
+									const account = snapshot.snapshots.find(s => s.name === accountName);
+									return account ? account.balance : null;
+								}),
+								borderColor: colors.backgroundColors[idx],
+								backgroundColor: colors.lightColors[idx]
+							};
+						})
+				};
+			case 'yearly':
+				return {
+					labels: yearly.map(snapshot => snapshot.date),
+					datasets:
+						distinctAccounts.map((accountName, idx) => {
+							return {
+								label: accountName,
+								data: yearly.map(snapshot => {
+									const account = snapshot.snapshots.find(s => s.name === accountName);
+									return account ? account.balance : null;
+								}),
+								borderColor: colors.backgroundColors[idx],
+								backgroundColor: colors.lightColors[idx]
+							};
+						})
+				};
+			case 'total':
+				console.log(networth);
+				return {
+					labels: networth.map(snapshot => snapshot.date),
+					datasets: [{
+						label: t('net_worth'),
+						data: networth.map(snapshot => snapshot.value),
+						borderColor: colors.backgroundColors[0],
+						backgroundColor: colors.lightColors[0]
+					}]
+				};
+			default:
+				return monthly;
+		}
+	};
+
+	const maxLength = Math.max(...monthly.map(snapshot => snapshot.snapshots.length));
 
 	const colors = GetRandomColors(maxLength);
 
-	const distinctAccounts = history.map(snapshot => snapshot.snapshots.map(s => s.name)).flat().filter((value, index, self) => self.indexOf(value) === index);
-
-	const data = {
-		labels: history.map(snapshot => snapshot.date),
-		datasets:
-			distinctAccounts.map((accountName, idx) => {
-				return {
-					label: accountName,
-					data: history.map(snapshot => {
-						const account = snapshot.snapshots.find(s => s.name === accountName);
-						return account ? account.balance : null;
-					}),
-					borderColor: colors.backgroundColors[idx],
-					backgroundColor: colors.lightColors[idx]
-				};
-			})
-	};
+	const distinctAccounts = monthly.map(snapshot => snapshot.snapshots.map(s => s.name)).flat().filter((value, index, self) => self.indexOf(value) === index);
 
 	return (
 		<div class="account-histogram">
 			<h2>{t('account_histogram_header')}</h2>
+			<div className="graph-options">
+				<button onClick={() => setView('monthly')}>{t('monthly')}</button>
+				<button onClick={() => setView('yearly')}>{t('yearly')}</button>
+				<button onClick={() => setView('total')}>{t('total')}</button>
+			</div>
 			<div class='graph-container'>
 				<Line
 					height={300}
 					width={600}
-					data={data}
-					options={options}
-				/>
+					data={getData()}
+					options={options} />
 			</div>
 		</div>
 	);
