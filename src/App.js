@@ -5,11 +5,42 @@ import { Pie, Line } from 'react-chartjs-2';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import chroma from 'chroma-js';
-import { FaBars } from 'react-icons/fa';
+import ManageBudgets from './components/manageBudget';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function App() {
+	const [page, setPage] = useState('summary');
+
+	function handlePageChange(newPage) {
+		setPage(newPage);
+	}
+
+	return (
+		<div>
+		<NavBar onNavigate={handlePageChange} />
+		<div class="body-panels">
+			<div class="bp" />
+			<div>
+				{page === 'summary' && <Summary />}
+				{page === 'manage-budgets' && <ManageBudgets />}
+			</div>
+			<div class="bp" />
+		</div>
+		</div>
+	);
+}
+
+function Loading() {
+	return (
+			<div className="loading-container">
+					<div className="loading-spinner"></div>
+					<p>Loading...</p>
+			</div>
+	);
+}
+
+function Summary() {
 	const [data, setData] = useState(null);
 	const [loading, setLoading] = useState(true);
 
@@ -31,26 +62,19 @@ function App() {
 	}, []);
 
 	if (loading) {
-		return <div>Loading...</div>;
+		return <Loading />;
 	}
 
 	return (
 		<div>
-		<NavBar />
-		<div class="body-panels">
-			<div class="bp" />
-			<div>
-				<NetWorthSummary summary={data['total_by_type']} />
-				<AccountHistogram monthly={data['snapshot_history_monthly']} yearly={data['snapshot_history_yearly']} networth={data['snapshot_history_networth']} />
-				<AccountTable accounts={data.account_balance_with_mom_change} />
-			</div>
-			<div class="bp" />
+			<NetWorthSummary summary={data['total_by_type']} />
+			<AccountHistogram monthly={data['snapshot_history_monthly']} yearly={data['snapshot_history_yearly']} networth={data['snapshot_history_networth']} />
+			<AccountTable accounts={data.account_balance_with_mom_change} />
 		</div>
-		</div>
-	);
+	)
 }
 
-function NavBar() {
+function NavBar({onNavigate}) {
 	const { t, i18n } = useTranslation();
 	const name = "John Doe";
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -87,14 +111,14 @@ function NavBar() {
 							<span></span>
 							<span></span>
 					</div>
-					<a className="navbar-item" href="/">
-						{t('navbar_welcome')} {name}!
+					<a className="brand" href="/">
+						Budgeteer
 					</a>
 			</div>
 			<div className={`navbar-menu ${menuOpen ? 'is-active' : ''}`}>
 					<div className="navbar-start">
-						<a href="/" className="navbar-item">{t('summary')}</a>
-						<a href="/manage-budgets" className="navbar-item">{t('manage_budgets')}</a>
+						<a href="/" className="navbar-item" onClick={(e) => { e.preventDefault(); onNavigate('summary'); }}>{t('summary')}</a>
+						<a href="/manage-budgets" className="navbar-item" onClick={(e) => { e.preventDefault(); onNavigate('manage-budgets'); }}>{t('manage_budgets')}</a>
 						<div className="navbar-item-small" onClick={on_switch}>
 							{flagemojiToPNG(getFlagEmoji(i18n.language))}
 							<span>{t('navbar_switch_language')}</span>

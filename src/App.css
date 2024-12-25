@@ -26,6 +26,11 @@ a {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	.brand {
+		color: white;
+		font-size: 1.5rem;
+		font-weight: bold;
+	}
 }
 
 .navbar-item {
@@ -228,4 +233,120 @@ a {
 .graph-options button:hover {
 	background-color: #0056b3;
 	transition: background-color 0.8s ease;
+}
+
+/* Loading.css */
+
+.loading-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #f9f9f9;
+}
+
+.loading-spinner {
+	border: 8px solid #f3f3f3;
+	border-top: 8px solid #4e73df;
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+	margin-top: 1rem;
+	font-size: 1.2rem;
+	color: #333;
+}
+
+/* Styles for Manage Budgets page */
+.manage-budgets {
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	margin: 1rem 0;
+	padding: 1rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.manage-budgets:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.manage-budgets h2 {
+	border-bottom: 2px solid #333;
+	padding-bottom: 0.5rem;
+	margin-bottom: 1rem;
+	font-size: 1.5rem;
+}
+
+.budget-form input,
+.budget-form select {
+	display: block;
+	width: 100%;
+	margin-bottom: 1rem;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.budget-form button {
+	background-color: #4e73df;
+	color: white;
+	padding: 0.5rem 1rem;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.budget-form button:hover {
+	background-color: #3b5bbf;
+}
+
+.account-selector {
+	margin-top: 1rem;
+}
+
+.account-selector select {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.budget-items {
+	margin-top: 2rem;
+}
+
+.budget-item {
+	background-color: #fff;
+	border: 1px solid #eee;
+	border-radius: 4px;
+	padding: 1rem;
+	margin-bottom: 1rem;
+}
+
+.budget-item h3 {
+	margin-top: 0;
+}
+
+.budget-item button {
+	background-color: #1cc88a;
+	color: white;
+	padding: 0.5rem 1rem;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.budget-item button:hover {
+	background-color: #17a673;
 }
