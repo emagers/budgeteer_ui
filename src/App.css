@@ -90,6 +90,9 @@ a {
 	color: white;
 	text-decoration: none;
 	font-size: x-small;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .net-worth-summary,
@@ -266,8 +269,8 @@ a {
 	color: #333;
 }
 
-/* Styles for Manage Budgets page */
-.manage-budgets {
+/* Styles for Manage Accounts page */
+.manage-accounts {
 	background-color: #f9f9f9;
 	border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -276,39 +279,172 @@ a {
 	transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.manage-budgets:hover {
+.manage-accounts:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.manage-budgets h2 {
+.manage-accounts h2 {
 	border-bottom: 2px solid #333;
 	padding-bottom: 0.5rem;
 	margin-bottom: 1rem;
 	font-size: 1.5rem;
 }
 
-.budget-form input,
-.budget-form select {
-	display: block;
-	width: 100%;
-	margin-bottom: 1rem;
-	padding: 0.5rem;
-	border: 1px solid #ccc;
+.position-list {
+	margin-top: 2rem;
+	border: 1px solid #eee;
+	background-color: #fff;
 	border-radius: 4px;
 }
 
-.budget-form button {
-	background-color: #4e73df;
+.position-item {
+	background-color: #fff;
+	border-radius: 4px;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.position-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.position-item h4 {
+	margin-top: 0;
+	padding-top: 1rem;
+}
+
+.position-item-value {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem 1rem;
+	border-bottom: 1px solid #eee;
+}
+
+.position-item-value:last-child {
+	border-bottom: none;
+}
+
+.position-item-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1rem;
+	padding: 1rem;
+}
+
+.position-item-actions button {
+	background-color: #1cc88a;
 	color: white;
 	padding: 0.5rem 1rem;
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
+	margin-left: 0.5rem;
 }
 
-.budget-form button:hover {
-	background-color: #3b5bbf;
+.position-item-actions button:hover {
+	background-color: #17a673;
+}
+
+.budget-list {
+	margin-top: 2rem;
+	padding-bottom: 2rem;
+}
+
+.budget-list h3,
+.position-list h3 {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	padding: 1rem;
+}
+
+.budget-list ul,
+.position-list ul {
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+}
+
+.budget-item {
+	background-color: #fff;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.budget-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.budget-item h3 {
+	margin-top: 0;
+	padding-top: 1rem;
+}
+
+.budget-item-value {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem 1rem;
+	border-bottom: 1px solid #eee;
+}
+
+.budget-item-value:last-child {
+	border-bottom: none;
+}
+
+.budget-item-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1rem;
+	padding: 1rem;
+}
+
+.budget-item-actions button {
+	background-color: #1cc88a;
+	color: white;
+	padding: 0.5rem 1rem;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-left: 0.5rem;
+}
+
+.budget-item-actions button:hover {
+	background-color: #17a673;
+}
+
+.expand-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 1.2rem;
+	margin-left: 0.5rem;
+	transition: transform 0.3s ease;
+	display: inline-flex;
+	align-items: center;
+}
+
+.expand-button::before {
+	content: '';
+	display: inline-block;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-right: 2px solid #000;
+	border-bottom: 2px solid #000;
+	transform: rotate(45deg);
+	transition: transform 0.3s ease;
+}
+
+.expand-button.collapsed::before {
+	transform: rotate(45deg);
+}
+
+.expand-button.expanded::before {
+	transform: rotate(-135deg);
 }
 
 .account-selector {
@@ -322,31 +458,29 @@ a {
 	border-radius: 4px;
 }
 
-.budget-items {
-	margin-top: 2rem;
-}
-
-.budget-item {
+.account-details {
 	background-color: #fff;
 	border: 1px solid #eee;
 	border-radius: 4px;
 	padding: 1rem;
+	margin-top: 1rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.account-details h3 {
+	border-bottom: 2px solid #333;
+	padding-bottom: 0.5rem;
 	margin-bottom: 1rem;
+	font-size: 1.5rem;
 }
 
-.budget-item h3 {
-	margin-top: 0;
+.account-details p {
+	color: #666;
+	line-height: 1.6;
 }
 
-.budget-item button {
-	background-color: #1cc88a;
-	color: white;
-	padding: 0.5rem 1rem;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
-
-.budget-item button:hover {
-	background-color: #17a673;
+ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
 }

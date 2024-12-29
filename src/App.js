@@ -5,7 +5,8 @@ import { Pie, Line } from 'react-chartjs-2';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import chroma from 'chroma-js';
-import ManageBudgets from './components/manageBudget';
+import ManageBudgets from './components/manageAccounts';
+import Loading from './components/loading';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -23,20 +24,11 @@ function App() {
 			<div class="bp" />
 			<div>
 				{page === 'summary' && <Summary />}
-				{page === 'manage-budgets' && <ManageBudgets />}
+				{page === 'manage-accounts' && <ManageBudgets />}
 			</div>
 			<div class="bp" />
 		</div>
 		</div>
-	);
-}
-
-function Loading() {
-	return (
-			<div className="loading-container">
-					<div className="loading-spinner"></div>
-					<p>Loading...</p>
-			</div>
 	);
 }
 
@@ -118,10 +110,9 @@ function NavBar({onNavigate}) {
 			<div className={`navbar-menu ${menuOpen ? 'is-active' : ''}`}>
 					<div className="navbar-start">
 						<a href="/" className="navbar-item" onClick={(e) => { e.preventDefault(); onNavigate('summary'); }}>{t('summary')}</a>
-						<a href="/manage-budgets" className="navbar-item" onClick={(e) => { e.preventDefault(); onNavigate('manage-budgets'); }}>{t('manage_budgets')}</a>
+						<a href="/manage-accounts" className="navbar-item" onClick={(e) => { e.preventDefault(); onNavigate('manage-accounts'); }}>{t('manage_accounts')}</a>
 						<div className="navbar-item-small" onClick={on_switch}>
 							{flagemojiToPNG(getFlagEmoji(i18n.language))}
-							<span>{t('navbar_switch_language')}</span>
 						</div>
 						<a href="/logout" className="navbar-item">{t('logout')}</a>
 					</div>
